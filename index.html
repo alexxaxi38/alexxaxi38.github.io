@@ -1,0 +1,100 @@
+<?php
+define('API_KEY','7281479307 : AAG9gyqe2Fzu73v1IibCgnJ9LeHM7DDcyY8');
+function bot($method,$datas=[]){
+    $url = "https://api.telegram.org/bot".API_KEY."/".$method;
+    $ch = curl_init();
+    curl_setopt($ch,CURLOPT_URL,$url);
+    curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+    curl_setopt($ch,CURLOPT_POSTFIELDS,$datas);
+    $res = curl_exec($ch);
+    if(curl_error($ch)){
+        var_dump(curl_error($ch));
+    }else{
+        return json_decode($res);
+    }
+}
+$update = json_decode(file_get_contents('php://input'));
+$msg = $update->message;
+$text = $msg->text;
+mkdir("data");
+$first = $msg->from->first_name;
+$last = $msg->from->last_name;
+$chat_id = $msg->chat->id;
+$from_id = $msg->from->id;
+$message_id = $msg->message_id;
+$admin = 311526009;
+mkdir("data");
+mkdir("data/$from_id");
+	//================//
+function sendaction($chat_id, $action){
+bot('sendchataction',[
+'chat_id'=>$chat_id,
+'action'=>$action
+]);
+}
+function save($filename,$TXTdata)
+	{
+	$myfile = fopen($filename, "w") or die("Unable to open file!");
+	fwrite($myfile, "$TXTdata");
+	fclose($myfile);
+	}
+     //====================//
+if ($text == '/start') {
+sendaction($chat_id,'typing');
+mkdir("data/$from_id");
+bot('sendMessage',[
+'chat_id'=>$chat_id,
+'text'=>"سلام دوست عزیز ...😄\n\n- به ربات دریافت پیام ناشناس خوش اومدی من با لینکی مخصوصی که به تو میدم میتونی اون لینک رو به دوستانت بدی ...✅\n\nلازم نیست کاربری که میخواد برات پیام ارسال کنه حتما باید تو ربات بیاد بلکه این نسخه از دریافت پیام ناشناس تحب وب هست و کاربران میتونند به راحتی برات پیام ارسال کنند ...☺️\n\nراستی پیام هایی که ارسال میشه میتونی تو همیت ربات دریافت کنیش ...💐\n\n‼️ Channel: @bot_sazan_good
+❤️ #king_a_king",
+'reply_markup'=>json_encode([
+            'resize_keyboard'=>true,
+            'keyboard'=>[
+              [
+              ['text'=>"دریافت لینک مخصوص من 🍃"]
+              ],
+              ],
+        ])
+        ]);
+}
+if ($text == "دریافت لینک مخصوص من 🍃"){
+sendaction($chat_id,'typing');
+mkdir("send");
+mkdir("send/$from_id");
+$source = file_get_contents("bot/index.php");
+$test = file_get_contents("bot/index.html");
+$source = str_replace("**ID**",$from_id,$source);
+save("send/$from_id/index.php",$source);
+save("send/$from_id/index.html",$test);
+bot('sendmessage',[
+'chat_id'=>$chat_id,
+'text'=>"سلام $first $last هستم ...😋
+
+رو لینک زیر بزن و هر انتقاد،پیشنهاد یا اعترافی داری با خیال راحت بزن چون پیامت بدون اسم یا چیز دیگه ای برای من ارسال میشه ...✅
+
+راستی لازم نیست تو ربات پیامت رو ارسال کنی ...😉
+چون تحت وب هست و به اسونی و راحتی میتونی میامت رو ارسال کنی ...😜
+
+😀 لینک من :
+
+https://king_a_king.owhost.ir/da/send/$from_id/index.html
+
+id bot : @add_group_robot",
+]);
+}
+if($text == "/da" && $from_id == $admin){
+    $user = file_get_contents('data/user.txt');
+    $member_id = explode("\n",$user);
+    $member_count = count($member_id) -1;
+    bot('sendMessage',[
+      'chat_id'=>$chat_id,
+      'text'=>"تعداد کل اعضا: $member_count",
+    ]);
+}
+$user = file_get_contents('data/user.txt');
+    $members = explode("\n",$user);
+    if (!in_array($chat_id,$members)){
+      $add_user = file_get_contents('data/user.txt');
+      $add_user .= $chat_id."\n";
+     file_put_contents('data/user.txt',$add_user);
+    }
+?>
